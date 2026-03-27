@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-function NetworkParticles() {
+function NetworkParticles({ count = 60 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points>(null);
   const linesRef = useRef<THREE.LineSegments>(null);
-  const count = 60;
   const connectionDistance = 1.5;
 
   const { positions, velocities } = useMemo(() => {
@@ -88,15 +87,23 @@ function NetworkParticles() {
 }
 
 export default function ParticleField() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <div className="absolute inset-0 opacity-50 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        gl={{ alpha: true, powerPreference: isMobile ? "low-power" : "high-performance" }}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
       >
-        <NetworkParticles />
+        <NetworkParticles count={isMobile ? 30 : 60} />
       </Canvas>
     </div>
   );

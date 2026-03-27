@@ -20,7 +20,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, delay: 0.1 }}
-        className="absolute inset-0 hidden md:flex items-center justify-center pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
       >
         <div className="w-full h-full max-w-[950px] max-h-[950px] pointer-events-auto">
           <Suspense fallback={null}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, ReactNode } from "react";
+import { useRef, useState, ReactNode, useCallback } from "react";
 import { motion } from "framer-motion";
 
 interface TiltCardProps {
@@ -14,18 +14,27 @@ export default function TiltCard({ children, className = "", delay = 0 }: TiltCa
   const [transform, setTransform] = useState("");
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+  const handleInteraction = useCallback((clientX: number, clientY: number) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const rotateX = (0.5 - y) * 12;
-    const rotateY = (x - 0.5) * 12;
+    const x = (clientX - rect.left) / rect.width;
+    const y = (clientY - rect.top) / rect.height;
+    const rotateX = (0.5 - y) * 10;
+    const rotateY = (x - 0.5) * 10;
     setTransform(`perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
     setGlowPos({ x: x * 100, y: y * 100 });
+  }, []);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    handleInteraction(e.clientX, e.clientY);
   }
 
-  function handleMouseLeave() {
+  function handleTouchMove(e: React.TouchEvent<HTMLDivElement>) {
+    const touch = e.touches[0];
+    if (touch) handleInteraction(touch.clientX, touch.clientY);
+  }
+
+  function handleEnd() {
     setTransform("");
     setGlowPos({ x: 50, y: 50 });
   }
@@ -38,13 +47,15 @@ export default function TiltCard({ children, className = "", delay = 0 }: TiltCa
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay }}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={handleEnd}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleEnd}
       style={{ transform, transition: transform ? "transform 0.1s ease-out" : "transform 0.4s ease-out" }}
       className={`glass-card p-6 relative overflow-hidden ${className}`}
     >
-      {/* Cursor glow highlight */}
+      {/* Cursor/touch glow highlight */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 hover-parent-glow transition-opacity duration-300"
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300"
         style={{
           background: `radial-gradient(300px circle at ${glowPos.x}% ${glowPos.y}%, rgba(6,182,212,0.12), transparent 60%)`,
           opacity: transform ? 1 : 0,

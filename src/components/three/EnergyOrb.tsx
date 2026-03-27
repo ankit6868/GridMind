@@ -1,13 +1,23 @@
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Sphere, MeshDistortMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
-function OrbitingParticles() {
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
+function OrbitingParticles({ count = 300 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
-  const count = 300;
 
   const [positions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -26,7 +36,7 @@ function OrbitingParticles() {
       col[i * 3 + 2] = 0.8 + t * 0.2;
     }
     return [pos, col];
-  }, []);
+  }, [count]);
 
   useFrame((_, delta) => {
     if (ref.current) {
@@ -141,27 +151,35 @@ function MouseTracker({ children }: { children: React.ReactNode }) {
 }
 
 export default function EnergyOrb() {
+  const isMobile = useIsMobile();
+  // On mobile, push camera far back and scale down so entire orb + all rings fit fully inside the viewport
+  const cameraZ = isMobile ? 14 : 8;
+  const fov = isMobile ? 35 : 50;
+  const scale = isMobile ? 0.55 : 1;
+
   return (
-    <div className="w-full h-full min-h-[500px] lg:min-h-[600px]" onPointerMove={() => {}}>
+    <div className="w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px]" onPointerMove={() => {}}>
       <Canvas
-        camera={{ position: [0, 0, 8], fov: 50 }}
+        camera={{ position: [0, 0, cameraZ], fov }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        gl={{ alpha: true, antialias: !isMobile, powerPreference: isMobile ? "low-power" : "high-performance" }}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
         frameloop="always"
       >
         <ambientLight intensity={0.4} />
         <pointLight position={[5, 5, 5]} intensity={1} color="#06b6d4" />
         <pointLight position={[-5, -3, 3]} intensity={0.6} color="#8b5cf6" />
-        <pointLight position={[0, 5, -3]} intensity={0.3} color="#3b82f6" />
+        {!isMobile && <pointLight position={[0, 5, -3]} intensity={0.3} color="#3b82f6" />}
 
-        <MouseTracker>
-          <GlowingSphere />
-          <OrbitingParticles />
-          <RingOrbit radius={2.3} speed={0.25} color="#06b6d4" tilt={Math.PI / 2} />
-          <RingOrbit radius={2.8} speed={-0.18} color="#8b5cf6" tilt={Math.PI / 2.5} />
-          <RingOrbit radius={3.2} speed={0.12} color="#3b82f6" tilt={Math.PI / 3} />
-        </MouseTracker>
+        <group scale={scale}>
+          <MouseTracker>
+            <GlowingSphere />
+            <OrbitingParticles count={isMobile ? 100 : 300} />
+            <RingOrbit radius={2.3} speed={0.25} color="#06b6d4" tilt={Math.PI / 2} />
+            <RingOrbit radius={2.8} speed={-0.18} color="#8b5cf6" tilt={Math.PI / 2.5} />
+            <RingOrbit radius={3.2} speed={0.12} color="#3b82f6" tilt={Math.PI / 3} />
+          </MouseTracker>
+        </group>
       </Canvas>
     </div>
   );

@@ -12,11 +12,9 @@ export default function CTA() {
   return (
     <section id="cta" className="relative py-32 px-6 overflow-hidden">
       {/* 3D Particle Network Background */}
-      <div className="hidden md:block">
-        <Suspense fallback={null}>
-          <ParticleField />
-        </Suspense>
-      </div>
+      <Suspense fallback={null}>
+        <ParticleField />
+      </Suspense>
 
       {/* Gradient glow */}
       <div className="absolute inset-0 pointer-events-none">

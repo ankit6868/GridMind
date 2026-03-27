@@ -45,11 +45,9 @@ export default function TechStack() {
       <div className="section-divider max-w-4xl mx-auto mb-24" />
 
       {/* 3D Floating Grid Background */}
-      <div className="hidden md:block">
-        <Suspense fallback={null}>
-          <FloatingGrid />
-        </Suspense>
-      </div>
+      <Suspense fallback={null}>
+        <FloatingGrid />
+      </Suspense>
 
       <div className="relative z-10">
         <SectionHeading

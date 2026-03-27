@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-function WaveGrid() {
+function WaveGrid({ gridSize = 35 }: { gridSize?: number }) {
   const ref = useRef<THREE.Points>(null);
-  const cols = 35;
-  const rows = 35;
+  const cols = gridSize;
+  const rows = gridSize;
   const count = cols * rows;
   const spacing = 0.3;
 
@@ -56,15 +56,23 @@ function WaveGrid() {
 }
 
 export default function FloatingGrid() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
     <div className="absolute inset-0 opacity-40 pointer-events-none">
       <Canvas
         camera={{ position: [0, 3, 6], fov: 50 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        gl={{ alpha: true, powerPreference: isMobile ? "low-power" : "high-performance" }}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
       >
-        <WaveGrid />
+        <WaveGrid gridSize={isMobile ? 20 : 35} />
       </Canvas>
     </div>
   );
