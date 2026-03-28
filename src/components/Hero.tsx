@@ -15,7 +15,7 @@ export default function Hero() {
       <div className="radial-glow top-[-200px] left-[-200px]" />
       <div className="radial-glow bottom-[-200px] right-[-100px]" />
 
-      {/* 3D Orb as full background behind text - no scale animation to prevent resize flash */}
+      {/* 3D Orb as full background behind text */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
