@@ -52,13 +52,19 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} GridMind. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            {["Twitter", "Discord", "GitHub", "Telegram"].map((social) => (
+            {[
+              { name: "Twitter", url: "https://x.com/gridmind_web3" },
+              { name: "Telegram", url: "https://t.me/gridmindchat" },
+              { name: "Whitepaper", url: "https://drive.google.com/file/d/1LGOTTJWLvFIXCYMsuoA7Q1y37SKO-2VG/view" },
+            ].map((social) => (
               <a
-                key={social}
-                href="#"
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
               >
-                {social}
+                {social.name}
               </a>
             ))}
           </div>

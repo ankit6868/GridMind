@@ -89,7 +89,7 @@ export default function Hero() {
           <GradientButton href="#cta">
             Get Started <ArrowRight className="w-4 h-4" />
           </GradientButton>
-          <GradientButton variant="outline" href="#features">
+          <GradientButton variant="outline" href="https://drive.google.com/file/d/1LGOTTJWLvFIXCYMsuoA7Q1y37SKO-2VG/view" target="_blank">
             <FileText className="w-4 h-4" /> Read Whitepaper
           </GradientButton>
         </motion.div>
